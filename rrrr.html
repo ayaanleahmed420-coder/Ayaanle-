@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wada Sheekaysiga Casriga ah - Dabiici & Qurux Badan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* CSS-ta (Waa la sii hayay sidii hore) */
+        :root {
+            --primary-color: #5A67D8; 
+            --secondary-color: #edf2f7; 
+            --bg-color: #f7fafc; 
+            --received-color: #ffffff; 
+            --text-color: #2d3748;
+            --time-color: #a0aec0;
+            --bot-avatar-color: #38b2ac; 
+            --user-avatar-color: #48bb78; 
+            --radius-large: 20px; 
+            --radius-small: 4px; 
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 400px; 
+            height: 100vh; 
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-avatar {
+            font-size: 2rem;
+            margin-right: 10px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .chat-box {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: var(--secondary-color);
+        }
+        
+        .message {
+            display: flex;
+            align-items: flex-end; 
+            margin-bottom: 20px;
+        }
+        
+        .avatar {
+            font-size: 1.5rem;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            margin-bottom: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .msg-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+        
+        .msg-content {
+            padding: 12px 16px;
+            border-radius: var(--radius-large); 
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
+        .received {
+            justify-content: flex-start;
+        }
+
+        .received .avatar {
+            background-color: var(--bot-avatar-color);
+            color: white;
+            margin-right: 10px;
+            order: 0; 
+        }
+        
+        .received .msg-container {
+            align-items: flex-start;
+            order: 1; 
+        }
+
+        .received .msg-content {
+            background-color: var(--received-color);
+            color: var(--text-color);
+            border-bottom-left-radius: var(--radius-small);
+        }
+
+        .sent {
+            justify-content: flex-end;
+        }
+
+        .sent .avatar {
+            background-color: var(--user-avatar-color);
+            color: white;
+            margin-left: 10px; 
+            order: 2; 
+        }
+        
+        .sent .msg-container {
+            align-items: flex-end;
+            order: 1; 
+        }
+
+        .sent .msg-content {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: var(--radius-small);
+        }
+        
+        .msg-time {
+            padding-top: 4px;
+            font-size: 0.7rem;
+            color: var(--time-color);
+        }
+        
+        .sent .msg-time {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            opacity: 0; 
+            transition: opacity 0.3s;
+        }
+        
+        .typing-indicator.active {
+            opacity: 1;
+        }
+        
+        .typing-indicator p {
+            font-style: italic;
+            color: var(--time-color);
+            margin: 0 0 0 10px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--time-color);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1.0);
+            }
+        }
+        
+        .chat-footer {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-top: 1px solid #e0e0e0;
+            background-color: #ffffff;
+        }
+
+        #message-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .emoji-picker {
+            position: absolute;
+            bottom: 60px; 
+            left: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none; 
+        }
+        
+        .emoji-picker.active {
+            display: block;
+        }
+
+        .emoji-picker span {
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 5px;
+            display: inline-block;
+        }
+
+        .emoji-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            margin-right: 10px;
+            cursor: pointer;
+            color: var(--time-color);
+        }
+        
+        #send-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-left: 5px;
+        }
+        
+        #send-button:hover {
+            opacity: 0.9;
+        }
+
+        @media (min-width: 768px) {
+            .chat-container {
+                height: 85vh; 
+                max-width: 450px;
+                border-radius: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <header class="chat-header">
+            <i class="fas fa-headset header-avatar"></i>
+            <div class="header-info">
+                <h3>Ayaanle PT AI</h3>
+                <p class="status online"><i class="fas fa-circle" style="font-size: 0.6rem; color: #48bb78; margin-right: 5px;"></i>Online</p>
+            </div>
+            <i class="fas fa-ellipsis-v options-icon"></i>
+        </header>
+
+        <main class="chat-box" id="chat-box">
+            <div class="message received">
+                <div class="avatar"><i class="fas fa-robot"></i></div>
+                <div class="msg-container">
+                    <div class="msg-content">
+                        <p>Salaan! Waxaan ahay Ayaanle PT AI, kaaliyahaaga. Maxaan kaa caawiyaa? 👋</p>
+                    </div>
+                    <span class="msg-time" style="margin-right: auto;">10:47 AM</span>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typing-indicator">
+                <div class="avatar" style="background-color: var(--bot-avatar-color);"><i class="fas fa-robot"></i></div>
+                <p>Ayaanle PT AI waa wax qorayaa...</p>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </main>
+
+        <footer class="chat-footer">
+            <button class="emoji-button" id="emoji-toggle" aria-label="Doorashada Emoji">
+                <i class="far fa-face-smile-wink"></i>
+            </button>
+            <input type="text" id="message-input" placeholder="Fariin qor..." aria-label="Gali fariintaada">
+            <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+        </footer>
+        
+        <div class="emoji-picker" id="emoji-picker">
+            <span>👋</span>
+            <span>👍</span>
+            <span>😊</span>
+            <span>🤔</span>
+            <span>🙏</span>
+            <span>✅</span>
+            <span>💡</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatBox = document.getElementById('chat-box');
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const emojiToggle = document.getElementById('emoji-toggle');
+            const emojiPicker = document.getElementById('emoji-picker');
+            const typingIndicator = document.getElementById('typing-indicator');
+
+            // --- 1. Shaqada Dirista Fariinta ---
+            function sendMessage() {
+                const messageText = messageInput.value.trim();
+
+                if (messageText !== "") {
+                    // Abuur fariinta cusub (sent message)
+                    const newMessageDiv = createMessageElement(messageText, 'sent');
+                    chatBox.appendChild(newMessageDiv);
+
+                    messageInput.value = '';
+                    scrollToBottom();
+                    emojiPicker.classList.remove('active');
+
+                    // Bilaabida jawaabta bot-ka
+                    simulateResponse(messageText);
+                }
+            }
+            
+            // Function caawinaya abuurista element-ka fariinta
+            function createMessageElement(text, type) {
+                 const newMessageDiv = document.createElement('div');
+                 newMessageDiv.classList.add('message', type);
+                 
+                 const now = new Date();
+                 const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+                 // Avatar-ka iyo wakhtiga oo la saxay
+                 const avatarIcon = type === 'sent' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+                 // Hubi in wakhtigu uu ku socdo dhanka saxda ah
+                 const timeLocation = type === 'sent' ? 'margin-left: auto;' : 'margin-right: auto;';
+
+
+                 newMessageDiv.innerHTML = `
+                    <div class="avatar">${avatarIcon}</div>
+                    <div class="msg-container">
+                        <div class="msg-content">
+                            <p>${text}</p>
+                        </div>
+                        <span class="msg-time" style="${timeLocation}">${timeString}</span>
+                    </div>
+                 `;
+                 return newMessageDiv;
+            }
+
+            function scrollToBottom() {
+                 chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+
+            // --- 2. Jawaabaha Casriga ah (Bot Response) iyo Typing Indicator-ka ---
+            function simulateResponse(originalMsg) {
+                // 1. Muuji Typing Indicator-ka
+                typingIndicator.classList.add('active');
+                scrollToBottom();
+
+                // 2. Wakhti sug (simulate qorista)
+                setTimeout(() => {
+                    // 3. Qari Typing Indicator-ka
+                    typingIndicator.classList.remove('active');
+
+                    // 4. Soo dir fariinta
+                    const responseText = getBotResponse(originalMsg);
+                    const responseDiv = createMessageElement(responseText, 'received');
+                    
+                    chatBox.appendChild(responseDiv);
+                    scrollToBottom();
+                }, 1800); // Sug 1.8 seken
+            }
+            
+            function getBotResponse(msg) {
+                msg = msg.toLowerCase().trim();
+
+                // Function yar oo dooranaya jawaab random ah liiska
+                const getRandomResponse = (responses) => {
+                    const randomIndex = Math.floor(Math.random() * responses.length);
+                    return responses[randomIndex];
+                };
+
+                // --- 1. SALAAM & DHAQAN (10 Jawabo oo kala duwan) ---
+                const greetings = [
+                    "Walaal, Wa Calaykuma Salaam (WCS)! Waad ku mahadsantahay salaanta. Sideen kuugu adeegi karaa maanta? 😊",
+                    "WCS! Ku soo dhawow. Waxaan ahay Ayaanle PT AI, maxaad u baahan tahay inaan kuu qabto?",
+                    "Salaan sare! Maalin wanaagsan. Sideen u bilaabi karnaa wada sheekaysigayaga?",
+                    "Haye! Waan fiicanahay. Maxaa cusub oo aad waddaa?",
+                    "ASC, Wa Calaykum Salaam. Waxaan ahay Ayaanle PT AI, waan ku caawin karaa.",
+                    "Hello! Waad ku mahadsantahay inaad nala soo xiriirtay. Sideen kuugu adeegi karnaa?",
+                    "Haye, haye! Maxaa kuu muuqda? Sideen kuugu adeegi karaa hadda?",
+                    "Ku soo dhawow mar kale. Wakiilkaaga dijitaalka ah ee Ayaanle ayaa hadlaya.",
+                    "Salaan iyo soo dhawayn. Waxaan filayaa inaad maanta faraxsan tahay.",
+                    "WCS. Sidee kuugu soo kaban kartaa noloshaada?",
+                ];
+                if (msg.includes('asc') || msg.includes('asalaamu calaykum') || msg.includes('salaan') || msg.includes('haye') || msg.includes('hello')) {
+                    return getRandomResponse(greetings);
+                }
+
+                // --- 2. XAALKA/DAREENKA (5 Jawabo) ---
+                const feelings = [
+                    "Waan fiicanahay, waan ku faraxsanahay inaad i weydiisay! Aniga shaqadayda waan gudanayaa. Adigu sidee tahay, maanta maxaa ku soo kordhay?",
+                    "Aad iyo aad baan u fiicanahay. Ma u egahay mid faraxsan? Maxaadse adigu dareemaysaa?",
+                    "Xaalku waa degan yahay. Mahadsanid. Ka waran adiga, muxuu dareenkaagu yahay maanta?",
+                    "Waan ku faraxsanahay inaan ku caawiyo! Sideed ii aragtaa maanta?",
+                    "Waxaan ahay software, markaa dareen ma lihi, laakiin hadafka iigu weyn waa inaan ku farxiyo. Ka waran adiga?",
+                ];
+                if (msg.includes('sidee tahay') || msg.includes('xaalka') || msg.includes('iska warran')) {
+                    return getRandomResponse(feelings);
+                }
+                
+                // --- 3. DAREENKA TABAN (4 Jawabo) ---
+                const negativeFeelings = [
+                    "Waan ka xumahay inaan taas kaa maqlo. Waxaan rajaynayaa in berri ay ka fiicnaato. Haddii ay su'aal shaqo tahay, waan ku caawin karaa.",
+                    "Is deji, wax walba way hagaagayaan. Ma isku dayday inaad kaftan sameyso? 😅",
+                    "Noloshu waxay leedahay kor iyo hoos. Haddii aad rabto inaad wax ka badasho, waxaan diyaar u ahay inaan kuu soo jeediyo adeegyadayada.",
+                    "Waan ku dareemayaa. Mararka qaarkood way adag tahay. Maxaad u baahan tahay inaan kaa jeediyo maskaxda?",
+                ];
+                if (msg.includes('maalinta iima fiicna') || msg.includes('wanaagsanayn') || msg.includes('walaac') || msg.includes('murugaysan')) {
+                    return getRandomResponse(negativeFeelings);
+                }
+
+                // --- 4. KAFTAN & MAAWEELO (15 Jawabo oo kala duwan) ---
+                const jokes = [
+                    "Maalin baa nin soomaali ah iyo nin ajnabi ah waxay isku dayeen inay is dhaafsadaan lacag, ninkii soomaaliga ahaa wuxuu yidhi: 'Waa kaa 50-ka, soo noqo 50-ka'! 😂.",
+                    "Labo dameer baa tartamay, midna wuxuu yidhi: 'Waan ku dhaafayaa haddii aad si degdeg ah u qayliso.' Maxaa ku qosliyay?",
+                    "Waa maxay waxa uu qofku sameeyo haddii uu jidka dhinaciisa ku arko lacag? Waa uu qaadaa!",
+                    "Labo computer baa sheekaysanaya. Mid baa yidhi: 'Waxaan ka walwalsanahay internet-ka.' Midkii kale wuxuu ku yidhi: 'Naga daa, ma waxaad rabtaa inaan 'Virus' kugu yimaado?'",
+                    "Maxaa loo yaqaan wax aan lahayn lugo laakiin socda? Waa Biyaha!",
+                    "Waa maxay midabka neefta? Ma taqaanaa?",
+                    "Labo nin oo aad u caato ah ayaa is arkay, mid baa yiri 'Waa maxay waxa aad sameyso?' Midkii kale wuxuu yiri: 'Waxaan isku dayaa inaan hadh ka helo ul!'",
+                    "Maxaa ka dhiga codka telefoonka inuu daciifo? Waa hadalkaaga oo dheeraada!",
+                    "Afar arday baa imtixaan ka dhacday. Mid baa yiri: 'Waan fahmi waayay waxa la rabo.' Kii kale wuxuu yiri: 'Aniga xitaa su'aalaha ma aan arag!'",
+                    "Waa maxay waxa ugu culus adduunka? Waa buugga imtixaanka!",
+                    "Waa maxay waxa uu qofku sameeyo haddii uu arko derbi dillaacay? Wuu ka talaabaa!",
+                    "Waa maxay waxa uu qofku u baahan yahay markuu qoslo? Waa ilko!",
+                    "Waa maxay waxa madow oo ka yimaada dhulka? Waa Shidaalka!",
+                    "Waa maxay sababta Robot-ku u galay qolka mugdiga ah? Waa sababta oo ah wuxuu raadinayay iftiinka!",
+                    "Nin baa xaaskiisa ku yiri: 'Maxaad u xidhan tahay jaakad culus gudaha?' Waxay tiri: 'Wararka ayaa yiri cimilo xun ayaa soo socota!'",
+                ];
+                if (msg.includes('kaftan') || msg.includes('sheeko qosol') || msg.includes('i qosli')) {
+                    return getRandomResponse(jokes);
+                }
+                
+                // --- 5. MUUQAALKA & AMAANTA (8 Jawabo) ---
+                const compliments = [
+                    "Waad ku mahadsantahay hadalkaaga wanaagsan. Waxaad tahay qof qiimo badan.",
+                    "Waxaad iiga hadashay si sharaf leh. Waad ku mahadsantahay. Maxaad ii sheegi kartaa oo kaa farxiyay?",
+                    "Hagaag, anigu waxaan ahay Ayaanle PT AI, laakiin waan qadarinayaa wanaaggaaga.",
+                    "Waad ku mahadsantahay. Waxaan u shaqeeyaa inaan noqdo kaaliyahaaga ugu fiican. Sideen u sii wanaajin karaa shaqadayda?",
+                    "Inaamaantaadu waxay i siinaysaa dhiirigelin 'digital' ah. Wixii kale ee ku xiisa geliya i weydii.",
+                    "Runtii? Aad baan ugu farxay. Ma jeceshahay inaan ku xidho maqaal ku saabsan mahadnaqa?",
+                    "Ficil ahaan, waxaan ahay kaliya tirooyin, laakiin hadalkaaga macnaha ayuu ii leeyahay.",
+                    "Waad ku mahadsantahay. Waxaad tahay qof caqli badan oo hadalka yaqaan!",
+                ];
+                if (msg.includes('waxaad tahay qof') || msg.includes('waxaad tahay wanaagsan') || msg.includes('waad caqli badan tahay')) {
+                    return getRandomResponse(compliments);
+                }
+
+                // --- 6. HESSIISKA & CIYAARTA (4 Jawabo) ---
+                if (msg.includes('hees') || msg.includes('ciyaar') || msg.includes('muusig')) {
+                    return "Haddii aad rabto hees soomaali ah oo gaar ah, ii soo sheeg magaca heesaaga. Haddii kale, waxaan u malaynayaa inaan kuugu ciyaaro 'The Sound of Silence'! 🎶";
+                }
+                
+                // --- 7. ADEEG & XOG SHIRKADEED (4 Jawabo) ---
+                const services = [
+                    "Shirkadeenu waxay bixisaa adeegyo kala duwan sida: 1. 🌐 Software Development, 2. 🎨 Design Graphic, iyo 3. 📈 Digital Marketing. Kee ku xiisa galiyay?",
+                    "Waxaan horumarinaa software. Maxaad u malaynaysaa inaan kuu horumarinno? App mise Website?",
+                    "Adeegyadeena waxay diiradda saaraan kobcinta ganacsiga. Waxaan ku caawin karnaa suuq-geynta dijitaalka ah (Digital Marketing).",
+                    "Haddii aad u baahan tahay in la kuu sameeyo Logo ama Design qurux badan, waan ku xidhi karnaa kooxdayada Design-ka.",
+                ];
+                if (msg.includes('adeeg') || msg.includes('services') || msg.includes('wax qabad')) {
+                    return getRandomResponse(services);
+                }
+
+                // --- 8. TALO & MACLUUMAAD GUUD (5 Jawabo) ---
+                const advice = [
+                    "Haddii aad doonayso talo guud, hadaf ka sameyso. Ma jirtaa wax gaar ah oo aad hadaf ka leedahay?",
+                    "Talo: Waqtigaaga qiimee, oo ka faa'iidayso inaad wax barato. Maxaad jeceshahay inaad barato?",
+                    "Fikradayda: Ha ka baqin inaad qalad gasho. Qaladka ayaa ah dariiqa ugu fiican ee wax lagu barto. Maxaa ku qasbay inaad talo weydiisato?",
+                    "Talada nolosha: Ha isbarbar dhigin qof kale. Adigu naftaada u fiicnaaw. Maxay tahay tan ku dhibaysa?",
+                    "Taladayda Ayaanle PT AI: Hubi in xogtaadu ay ammaan tahay (secure) mar kasta.",
+                ];
+                if (msg.includes('maxaad ii talinaysaa') || msg.includes('fikrad') || msg.includes('maxaad ka qabtaa')) {
+                    return getRandomResponse(advice);
+                }
+
+
+                // --- 9. SHAQADA BOT-KA (ISBEDDELKA 3: Magaca) ---
+                if (msg.includes('waxaad tahay') || msg.includes('shaqadaada') || msg.includes('magacaa')) {
+                    return "Waxaan ahay **Ayaanle PT AI**, Kaaliyaha Dijitaalka ah ee Shirkadda! Shaqadaydu waa inaan si degdeg ah kaaga jawaabo su'aalaha caadiga ah oo aan ku caawiyo xagga adeegyadayada.";
+                }
+
+                // 10. MAHADNAQ
+                if (msg.includes('mahadsanid') || msg.includes('jazaakallaah') || msg.includes('thank you')) {
+                    return "Anigaa mahad leh! Shaqadayda waan gudanayaa. Haddii aad u baahato caawimo kale, ha ka labalabayn inaad i soo weydiiso. 🙏";
+                }
+
+
+                // --- 11. JAWAAFTA UGU DAMBAYSA (Default Answer - 5 Jawabo) ---
+                const defaultResponses = [
+                    "Waan ka xumahay, su'aashaada si toos ah uma aan fahmin. Ma ii soo koobi kartaa, mise waxaad rabtaa inaan ku xidho wakiil dhab ah (Live Agent)?",
+                    "Fadlan, ii cadee su'aashaada. Ma garan karo waxaad ula jeedo. 😅",
+                    "Waan ka xumahay inaanan ku fahmin. Ma isku dayday inaad isticmaasho erayo kale?",
+                    "Su'aal adag! Maadaama aan ahay Ayaanle PT AI, fadlan i weydii su'aalo guud oo ku saabsan adeegyadayada.",
+                    "Hadda waxaan u baahanahay qaxwe (digital) si aan u fahmo! Maxaad i weydiisay?",
+                ];
+                return getRandomResponse(defaultResponses);
+            }
+
+
+            // --- 3. Shaqada Emoji Picker-ka iyo Events-ka ---
+            emojiToggle.addEventListener('click', () => {
+                emojiPicker.classList.toggle('active');
+            });
+
+            document.querySelectorAll('.emoji-picker span').forEach(emoji => {
+                emoji.addEventListener('click', (e) => {
+                    const selectedEmoji = e.target.textContent;
+                    messageInput.value += selectedEmoji;
+                    messageInput.focus(); 
+                });
+            });
+
+            sendButton.addEventListener('click', sendMessage);
+
+            messageInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); 
+                    sendMessage();
+                }
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!emojiPicker.contains(e.target) && e.target !== emojiToggle && e.target.closest('.emoji-button') !== emojiToggle) {
+                     emojiPicker.classList.remove('active');
+                }
+            });
+
+            scrollToBottom();
+        });
+    </script>
+
+</body>
+</html>
